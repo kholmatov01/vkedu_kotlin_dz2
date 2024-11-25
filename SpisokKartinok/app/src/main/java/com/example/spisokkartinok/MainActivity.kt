@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.spisokkartinok.ui.theme.SpisokKartinokTheme
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,6 +55,19 @@ interface CatApi {
     suspend fun getCatImage(): CatResponse
 }
 class MainActivity : ComponentActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
+    private val retrofitController by lazy {
+        RetrofitController(API)
+    }
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, e ->
+        binding.kartinka.post {
+            setError(e.message ?: e.toString())
+        }
+    }
+
     @OptIn(ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +77,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val retrofit = Retrofit.Builder()
                         .baseUrl("https://cataas.com/")
-                        .addConverterFactory(GsonConverterFactory.create())
+//                        .addConverterFactory(GsonConverterFactory.create())
                         .build()
 
                     val catApi = retrofit.create(CatApi::class.java)
@@ -103,11 +117,11 @@ class MainActivity : ComponentActivity() {
                                 Text("Загрузка кошки...")
                             } else {
                                 if (catImageUrl.isNotEmpty()) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(model = catImageUrl),
+                                    /*Image(
+//                                        painter = rememberAsyncImagePainter(model = catImageUrl),
                                         contentDescription = "Кошка",
-                                        modifier = Modifier.size(200.dp)
-                                    )
+                                        modifier = Modifier.size(200.dp)*/
+//                                    )
                                 } else {
                                     Text("Не удалось загрузить кошку.")
                                 }
@@ -159,7 +173,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+    companion object {
+        const val API = "https://humor-jokes-and-memes.p.rapidapi.com/memes/random?number=1&media-type=image"
     }
+
+    }
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

@@ -1,19 +1,21 @@
 package com.example.spisokkartinok
 
+import android.media.Image
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.IOException
+import retrofit2.Response
+import retrofit2.http.GET
 
-data class Gif(var url: String)
-
-
-/*
+interface KartinkaApi {
+    @GET("humor-jokes-and-memes.p.rapidapi.com/memes/random?number=1&media-type=image")
+    suspend fun kartinka(): Response<Kartinka>
+}
 fun main() {
     val request = Request.Builder()
-        .url("https://giphy.p.rapidapi.com/v1/gifs/random?api_key=dc6zaTOxFJmzC")
+        .url("https://humor-jokes-and-memes.p.rapidapi.com/memes/random?number=1&media-type=image")
         .get()
         .addHeader("x-rapidapi-key", "df246e1a3cmsh33c6b29515b11b4p113f8djsnaba95bb6f6d8")
-        .addHeader("x-rapidapi-host", "giphy.p.rapidapi.com")
+        .addHeader("x-rapidapi-host", "humor-jokes-and-memes.p.rapidapi.com")
         .build()
     val client = OkHttpClient()
 
@@ -26,4 +28,4 @@ fun main() {
 
         println("RESPONSE BODY: " + response.body!!.string())
     }
-}*/
+}
