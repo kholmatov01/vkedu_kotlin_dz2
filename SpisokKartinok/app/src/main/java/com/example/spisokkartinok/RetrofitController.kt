@@ -1,32 +1,27 @@
 package com.example.spisokkartinok
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitController(api: String) : RequestController {
+object RetrofitController {
+    private const val BASE_URL = "https://humor-jokes-and-memes.p.rapidapi.com"
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(api)
-        .addConverterFactory(
-            Json { ignoreUnknownKeys = true }
-                .asConverterFactory(
-                    "application/json; charset=UTF8".toMediaType()
-                )
-        )
+    val retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    private val kartinkaApi = retrofit.create(KartinkaApi::class.java)
+    val api = retrofit.create(MemesApi::class.java)
 
-    override suspend fun requestKartinka(): Result {
-        val response = kartinkaApi.kartinka()
-        return if (response.isSuccessful) {
-            response.body()?.let {
-                Result.Ok(it)
-            } ?: Result.Error("Empty kartinka")
-        } else {
-            Result.Error(response.code().toString())
+    suspend fun getMemes(number: Int): List<Meme>? {
+        val response = api.getMemes(number)
+        if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                return body
+            }
         }
+        return null
     }
+
 }
