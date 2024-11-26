@@ -20,12 +20,12 @@ class MemesViewModel: ViewModel() {
             try {
                 isLoading = true
                 errorMessage = ""
-                val newMemes = RetrofitController.getMemes(number)
-                if (newMemes != null) {
-                    memesList.addAll(newMemes)
+                val newMeme = RetrofitController.getMeme(number)
+                if (newMeme != null) {
+                    memesList.add(newMeme)
                 }
             } catch (e: Exception) {
-                errorMessage = "Something went wrong"
+                errorMessage = e.message!!
             } finally {
                 isLoading = false
             }
