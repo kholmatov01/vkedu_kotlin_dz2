@@ -47,164 +47,21 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private val retrofitController by lazy { com.example.spisokkartinok.RetrofitController(BASE_URL) }
-
     @OptIn(ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            SpisokKartinokTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    FlowRow(
-                        modifier = Modifier
+        setContentView(R.layout.activity_main)
 
-                            .verticalScroll(rememberScrollState())
-                            .padding(innerPadding)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalArrangement = Arrangement.Center,
-
-
-                        ) {
-
-                    }
-
-                }
-            }
-        }
-    }
-
-
-
-}
-
-@Composable
-fun KartinkaScreen(retrofitController: RetrofitController) {
-    var kartinki_list by rememberSaveable { mutableStateOf<List<Meme>?>(null) }
-    var is_loading by rememberSaveable { mutableStateOf(false) }
-    var has_error by rememberSaveable { mutableStateOf(false) }
-    val is_landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val coroutine_scope = rememberCoroutineScope()
-    val handler = CoroutineExceptionHandler { _, exception ->
-        run {
-            is_loading = false
-            has_error = true
-            Toast.makeText(baseContext, exception.message ?: "", Toast.LENGTH_LONG).show()
-        }
-    }
-    Column(modifier = Modifier.fillMaxSize()) {
-        when {
-            is_loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
-            has_error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column {
-                        Box(modifier = Modifier.clickable(onClick = {
-                            showKartinka(
-                                coroutine_scope,
-                                retrofitController,
-                                handler,
-                                { kartinkaList = it },
-                                { is_loading = it },
-                                { has_error = it },
-                                baseContext
-                            )
-
-                        })) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = getString(R.string.refresh),
-                                tint = Color.Red, modifier = Modifier.size(30.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            else -> {
-                if (isLandscape) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(10.dp)
-                    )
-                    {
-                        items(gifList ?: emptyList()) { gifData ->
-                            OneGifItem(gifData)
-                        }
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    )
-                    {
-                        items(gifList ?: emptyList()) { gifData ->
-                            OneGifItem(gifData)
-                        }
-                    }
-                }
-            }
-        }
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Button(onClick = {
-                coroutineScope.launch(handler) {}
-                showTrendingGifs(
-                    coroutineScope,
-                    giphyRepository,
-                    BuildConfig.API_KEY,
-                    handler,
-                    { gifList = it },
-                    { isLoading = it },
-                    { hasError = it },
-                    baseContext
-                )
-            }, modifier = Modifier.weight(1f)) {
-                Text(text = getString(R.string.updateGifsTrending))
-            }
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, MemesFragment())
+                .commit()
         }
     }
 }
 
-fun showKartinka (
-    coroutine_scope: CoroutineScope,
-    retrofit_controller: RetrofitController,
-    handler: CoroutineExceptionHandler,
-    kartinki_list: (List<Meme>?) -> Unit,
-    set_loading: (Boolean) -> Unit,
-    set_error: (Boolean) -> Unit,
-    base_context: Context
-) {
-    coroutine_scope.launch(handler) {
-        set_loading(true)
-        set_error(false)
-        try {
-            val response = retrofit_controller.getKartinki(10)
-            kartinki_list(response?.data)
-        } catch (e: Exception) {
-            Toast.makeText(base_context, e.localizedMessage, Toast.LENGTH_SHORT).show()
-            set_error(true)
-        } finally {
-            set_loading(false)
-        }
-    }
-}
+
+
 
 @Composable
 fun KartinkaCard(uri: String) {

@@ -32,11 +32,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 
 class MemesFragment : Fragment() {
-    private val viewModel: MemesViewModel by viewModels()
+    private val view_model: MemesViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,46 +45,46 @@ class MemesFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                MemesScreen(viewModel)
+                MemesScreen(view_model)
             }
         }
     }
 }
 
 @Composable
-fun MemesScreen(viewModel: MemesViewModel = viewModel()) {
+fun MemesScreen(view_model: MemesViewModel = viewModel()) {
     val lazyState = rememberLazyStaggeredGridState()
 
     LaunchedEffect(Unit) {
-        if (viewModel.memesList.isEmpty()) {
-            viewModel.fetchMemes()
+        if (view_model.memesList.isEmpty()) {
+            view_model.fetchMemes()
         }
     }
 
     LaunchedEffect(lazyState) {
         snapshotFlow { lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collect { lastVisibleIndex ->
-                if (!viewModel.isLoading && lastVisibleIndex == viewModel.memesList.size - 1) {
-                    viewModel.fetchMemes()
+                if (!view_model.isLoading && lastVisibleIndex == view_model.memesList.size - 1) {
+                    view_model.fetchMemes()
                 }
             }
     }
 
-    if (viewModel.isLoading && viewModel.memesList.isEmpty()) {
+    if (view_model.isLoading && view_model.memesList.isEmpty()) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
             CircularProgressIndicator()
         }
-    } else if (viewModel.errorMessage.isNotEmpty() && viewModel.memesList.isEmpty()) {
+    } else if (view_model.errorMessage.isNotEmpty() && view_model.memesList.isEmpty()) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = viewModel.errorMessage, modifier = Modifier.padding(16.dp))
-                Button(onClick = { viewModel.fetchMemes() }) {
+                Text(text = view_model.errorMessage, modifier = Modifier.padding(16.dp))
+                Button(onClick = { view_model.fetchMemes() }) {
                     Text("Повторить")
                 }
             }
@@ -99,7 +99,7 @@ fun MemesScreen(viewModel: MemesViewModel = viewModel()) {
                 .statusBarsPadding()
                 .navigationBarsPadding(),
         ) {
-            itemsIndexed(viewModel.memesList) { index, meme ->
+            itemsIndexed(view_model.memesList) { index, meme ->
                 val imageHeight = meme.width.toFloat() / meme.height.toFloat()
                 Box(
                     modifier = Modifier
@@ -117,7 +117,7 @@ fun MemesScreen(viewModel: MemesViewModel = viewModel()) {
             }
         }
 
-        if (viewModel.isLoading) {
+        if (view_model.isLoading) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
