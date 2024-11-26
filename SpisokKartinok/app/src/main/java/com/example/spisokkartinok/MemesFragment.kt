@@ -45,6 +45,7 @@ class MemesFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
+//                Text("hello nikita")
                 MemesScreen(view_model)
             }
         }
@@ -57,7 +58,7 @@ fun MemesScreen(view_model: MemesViewModel = viewModel()) {
 
     LaunchedEffect(Unit) {
         if (view_model.memesList.isEmpty()) {
-            view_model.fetchMemes()
+            view_model.fetchMemes(20)
         }
     }
 
@@ -85,7 +86,7 @@ fun MemesScreen(view_model: MemesViewModel = viewModel()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = view_model.errorMessage, modifier = Modifier.padding(16.dp))
                 Button(onClick = { view_model.fetchMemes() }) {
-                    Text("Повторить")
+                    Text("Load MEMES")
                 }
             }
         }

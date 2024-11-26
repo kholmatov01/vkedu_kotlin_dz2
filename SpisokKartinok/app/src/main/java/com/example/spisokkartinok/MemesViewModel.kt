@@ -14,13 +14,13 @@ class MemesViewModel: ViewModel() {
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
 
-    fun fetchMemes() {
+    fun fetchMemes(number: Int = 1) {
         if (isLoading) return
         viewModelScope.launch {
             try {
                 isLoading = true
                 errorMessage = ""
-                val newMemes = RetrofitController.getMemes(20)
+                val newMemes = RetrofitController.getMemes(number)
                 if (newMemes != null) {
                     memesList.addAll(newMemes)
                 }

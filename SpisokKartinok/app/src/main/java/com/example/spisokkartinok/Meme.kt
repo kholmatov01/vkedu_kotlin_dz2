@@ -11,5 +11,5 @@ data class Meme(
     @SerialName("type") val type: String,
     @SerialName("width") val width: Int,
     @SerialName("height") val height: Int,
-    @SerialName("ratio") val ratio: Double,
+    @SerialName("ratio") val ratio: Float,
 )

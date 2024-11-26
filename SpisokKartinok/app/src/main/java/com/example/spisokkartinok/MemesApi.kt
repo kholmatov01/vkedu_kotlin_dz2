@@ -11,7 +11,7 @@ interface MemesApi {
         "x-rapidapi-host: humor-jokes-and-memes.p.rapidapi.com",
     )
     @GET("/memes/random?number=1&media-type=image")
-    suspend fun getMemes(@Query("number") number: Int): Response<List<Meme>>
+    suspend fun getMemes(@Query("number") number: Int = 1): Response<List<Meme>>
 }
 /*fun main() {
     val request = Request.Builder()
